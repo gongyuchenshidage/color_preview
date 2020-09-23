@@ -25,7 +25,7 @@ import Color_Select
 import resource_rc
 
 global d
-#global info1
+#global info1dddddd
 info1 = [
     {'C': 0, 'M': 0, 'Y': 0, 'R': 0, 'G': 0, 'B': 0},
     {'C': 0, 'M': 0, 'Y': 0, 'R': 0, 'G': 0, 'B': 0},
