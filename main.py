@@ -380,7 +380,7 @@ def PrusaGradient_active( linestoedit,color_start, color_stop,color_start_10,col
                             (current_z - (color_index - 1) * height_step) / height_step))
                 linestoedit[i] = linestoedit[i].replace(linestoedit[i], gradient_line + "\n" + linestoedit[i])
                 print(linestoedit[i])
-                QApplication.processevents()
+                QApplication.processEvents()
 
 
     print("156")
@@ -930,100 +930,110 @@ def postprocessingplugin():#获得数据，进行处理
         return
     global process
     if mode == "one_color":#单色处理
-        for i in coloronelayer:
-            index = coloronelayer.index(i)
-            coloronelayer[index] = getRGB(i)
-        color_R = coloronelayer[0][0]
-        color_G = coloronelayer[0][1]
-        color_B = coloronelayer[0][2]
-        loading()
-        one_color_printing(untitled.filename,lines1,color_R,color_G,color_B,colorflag)
-        openGcodeModel()#重新载入处理后的gcode文件进行预览
+        try:
+            for i in coloronelayer:
+                index = coloronelayer.index(i)
+                coloronelayer[index] = getRGB(i)
+            color_R = coloronelayer[0][0]
+            color_G = coloronelayer[0][1]
+            color_B = coloronelayer[0][2]
+            loading()
+            one_color_printing(untitled.filename,lines1,color_R,color_G,color_B,colorflag)
+            openGcodeModel()#重新载入处理后的gcode文件进行预览
+        except:
+            ui.exception_handling("单色处理失败")
     elif mode == "much_layers":
-        colors_num = int(ui.layers_num.text())
-        if ui.checkBox_4.isChecked():
-            if (heightdata_total_start[0] > heightdata_total_stop[0]) or (
-                    heightdata_total_stop[colors_num - 1] < heightdata_total_start[colors_num - 1]):
-                msg_box4 = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所输入的数值存在终止层大于起始层错误，请重新检查后输入！')
-                msg_box4.exec_()
-                return
-            muchlayersoptions = [0] * int(colors_num)
-            heightdata_total11 = [0] * int(ui.layers_num.text())
-            # 判断TRUEifturelayerm/shuru
-            for i in range(0, colors_num):
-                muchlayerslist = [0] * 5
-                #                heightdata_total11[i] = int(heightdata_total1[i])+ int(heightdata_total11[i-1])
-                muchlayerslist[0] = heightdata_total_start[i]
-                muchlayerslist[1] = heightdata_total_stop[i]
-                muchlayerslist[2] = getRGB(colormuchlayers[i])[0]
-                muchlayerslist[3] = getRGB(colormuchlayers[i])[1]
-                muchlayerslist[4] = getRGB(colormuchlayers[i])[2]
-                #                print(muchlayerslist)
-                muchlayersoptions[i] = muchlayerslist
-            #            print(muchlayersoptions)
-            if (int(heightdata_total11[colors_num - 1]) <= untitled.layerm):
-                #            print("yes ok!")
-                loading()
-                mutiple_color_printing(untitled.filename, lines1, muchlayersoptions, muchcolorflag)
-            else:
-                msg_box = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所已输入层高已超限制，请检查后重新输入')
-                msg_box.exec_()
-        elif ui.checkBox_3.isChecked():#平均分层
-            #ui.layers_num.setEnabled(True)
-            if (heightdata_total_start[0] > heightdata_total_stop[0]) or (heightdata_total_stop[colors_num - 1] < heightdata_total_start[colors_num - 1]):
-                msg_box4 = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所输入的数值存在终止层大于起始层错误，请重新检查后输入！')
-                msg_box4.exec_()
-                return
-            muchlayersoptions = [0] * int(colors_num)
-            heightdata_total11 = [0] * int(ui.layers_num.text())
-            v=untitled.layerm//colors_num
-            for i in range(0, colors_num):
-                muchlayerslist = [0] * 5
-                muchlayerslist[0] = i * v
-                muchlayerslist[1] = (i + 1) * v - 1
-                muchlayerslist[2] = getRGB(colormuchlayers[i])[0]
-                muchlayerslist[3] = getRGB(colormuchlayers[i])[1]
-                muchlayerslist[4] = getRGB(colormuchlayers[i])[2]
-                muchlayersoptions[i] = muchlayerslist
-            if (int(heightdata_total11[colors_num - 1]) <= untitled.layerm):
-                #            print("yes ok!")
-                loading()
-                mutiple_color_printing(untitled.filename, lines1, muchlayersoptions, muchcolorflag)
-            else:
-                msg_box = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所已输入层高已超限制，请检查后重新输入')
-                msg_box.exec_()
-        openGcodeModel()
+        try:
+            colors_num = int(ui.layers_num.text())
+            if ui.checkBox_4.isChecked():
+                if (heightdata_total_start[0] > heightdata_total_stop[0]) or (
+                        heightdata_total_stop[colors_num - 1] < heightdata_total_start[colors_num - 1]):
+                    msg_box4 = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所输入的数值存在终止层大于起始层错误，请重新检查后输入！')
+                    msg_box4.exec_()
+                    return
+                muchlayersoptions = [0] * int(colors_num)
+                heightdata_total11 = [0] * int(ui.layers_num.text())
+                # 判断TRUEifturelayerm/shuru
+                for i in range(0, colors_num):
+                    muchlayerslist = [0] * 5
+                    #                heightdata_total11[i] = int(heightdata_total1[i])+ int(heightdata_total11[i-1])
+                    muchlayerslist[0] = heightdata_total_start[i]
+                    muchlayerslist[1] = heightdata_total_stop[i]
+                    muchlayerslist[2] = getRGB(colormuchlayers[i])[0]
+                    muchlayerslist[3] = getRGB(colormuchlayers[i])[1]
+                    muchlayerslist[4] = getRGB(colormuchlayers[i])[2]
+                    #                print(muchlayerslist)
+                    muchlayersoptions[i] = muchlayerslist
+                #            print(muchlayersoptions)
+                if (int(heightdata_total11[colors_num - 1]) <= untitled.layerm):
+                    #            print("yes ok!")
+                    loading()
+                    mutiple_color_printing(untitled.filename, lines1, muchlayersoptions, muchcolorflag)
+                else:
+                    msg_box = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所已输入层高已超限制，请检查后重新输入')
+                    msg_box.exec_()
+
+            elif ui.checkBox_3.isChecked():#平均分层
+                #ui.layers_num.setEnabled(True)
+                if (heightdata_total_start[0] > heightdata_total_stop[0]) or (heightdata_total_stop[colors_num - 1] < heightdata_total_start[colors_num - 1]):
+                    msg_box4 = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所输入的数值存在终止层大于起始层错误，请重新检查后输入！')
+                    msg_box4.exec_()
+                    return
+                muchlayersoptions = [0] * int(colors_num)
+                heightdata_total11 = [0] * int(ui.layers_num.text())
+                v=untitled.layerm//colors_num
+                for i in range(0, colors_num):
+                    muchlayerslist = [0] * 5
+                    muchlayerslist[0] = i * v
+                    muchlayerslist[1] = (i + 1) * v - 1
+                    muchlayerslist[2] = getRGB(colormuchlayers[i])[0]
+                    muchlayerslist[3] = getRGB(colormuchlayers[i])[1]
+                    muchlayerslist[4] = getRGB(colormuchlayers[i])[2]
+                    muchlayersoptions[i] = muchlayerslist
+                if (int(heightdata_total11[colors_num - 1]) <= untitled.layerm):
+                    #            print("yes ok!")
+                    loading()
+                    mutiple_color_printing(untitled.filename, lines1, muchlayersoptions, muchcolorflag)
+                else:
+                    msg_box = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所已输入层高已超限制，请检查后重新输入')
+                    msg_box.exec_()
+            openGcodeModel()
+        except:
+            ui.exception_handling("分层处理失败")
     elif mode == "mix_colors":
-        colors_num = int(ui.mix_colors_num.text())
-        colorstartoptions = ["#000000"] * mix_colors_num
-        colorstopoptions = ["#000000"] * mix_colors_num
-        h = [0] * int(ui.mix_colors_num.text())
-        j = [0] * int(ui.mix_colors_num.text())
-        aa = [h, j]
-        if ui.checkBox.isChecked():#自定义渐变
-            for i in range(0, colors_num):
-                colorstartoptions[i] = getRGB(colorstart[i])
-                colorstopoptions[i] = getRGB(colorstop[i])
-                aa[0][i] = heightdata_total_start[i]
-                aa[1][i] = heightdata_total_stop[i]
-            Custom_Gradientprinting(untitled.filename, lines1, colorstartoptions, colorstopoptions, aa,
-                                    mixcolorstartflag, mixcolorstopflag)
-        elif ui.checkBox_2.isChecked():#平均渐变
-            v = untitled.layerm // colors_num
-            for i in range(0, colors_num):
-                colorstartoptions[i] = getRGB(colorstart[i])
-                colorstopoptions[i] = getRGB(colorstop[i])
-                aa[0][i] = i*v
-                aa[1][i] = (i+1)*v-1
-            print("111")
-            Gradientprinting(untitled.filename, lines1, colorstartoptions, colorstopoptions,
-                                    mixcolorstartflag, mixcolorstopflag)
+        try:
+            colors_num = int(ui.mix_colors_num.text())
+            colorstartoptions = ["#000000"] * mix_colors_num
+            colorstopoptions = ["#000000"] * mix_colors_num
+            h = [0] * int(ui.mix_colors_num.text())
+            j = [0] * int(ui.mix_colors_num.text())
+            aa = [h, j]
+            if ui.checkBox.isChecked():#自定义渐变
+                for i in range(0, colors_num):
+                    colorstartoptions[i] = getRGB(colorstart[i])
+                    colorstopoptions[i] = getRGB(colorstop[i])
+                    aa[0][i] = heightdata_total_start[i]
+                    aa[1][i] = heightdata_total_stop[i]
+                Custom_Gradientprinting(untitled.filename, lines1, colorstartoptions, colorstopoptions, aa,
+                                        mixcolorstartflag, mixcolorstopflag)
+            elif ui.checkBox_2.isChecked():#平均渐变
+                v = untitled.layerm // colors_num
+                for i in range(0, colors_num):
+                    colorstartoptions[i] = getRGB(colorstart[i])
+                    colorstopoptions[i] = getRGB(colorstop[i])
+                    aa[0][i] = i*v
+                    aa[1][i] = (i+1)*v-1
+                print("111")
+                Gradientprinting(untitled.filename, lines1, colorstartoptions, colorstopoptions,
+                                        mixcolorstartflag, mixcolorstopflag)
 
 
-#            print(colorstartoptions)
-#            print(colorstopoptions)
-        loading()
-        openGcodeModel()
+    #            print(colorstartoptions)
+    #            print(colorstopoptions)
+            loading()
+            openGcodeModel()
+        except:
+            ui.exception_handling("渐变处理失败")
 
 #        print(time.process_time())
 #        end1 = time.process_time()

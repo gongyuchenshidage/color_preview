@@ -551,19 +551,17 @@ class Ui_MainWindow(object):
         vv1 = False
         vv2 = False
 
-        try:
-
-            filename = str(
+        filename = str(
                 QFileDialog.getOpenFileName(None, self.locale.OpenModel, ",",
                                             "STL(*.stl);;GCODE(*.gcode)")[0])  # TODO: fix path
 
-            if filename != "":
-                layerm = 0
-                # self.planes = []
-                fileExt = os.path.splitext(filename)[1].upper()
-                filename = str(Path(filename))
-                if fileExt == ".STL":
-
+        if filename != "":
+            layerm = 0
+            # self.planes = []
+            fileExt = os.path.splitext(filename)[1].upper()
+            filename = str(Path(filename))
+            if fileExt == ".STL":
+                try:
                     self.loadSTL(filename)
                     Ui_MainWindow.one_color_radio.setEnabled(False)
                     Ui_MainWindow.much_layers_radio.setEnabled(False)
@@ -573,9 +571,12 @@ class Ui_MainWindow(object):
                     _translate = QtCore.QCoreApplication.translate
                     Ui_MainWindow.totalHeight.setText(_translate("MainWindow", ""))
                     Ui_MainWindow.namein.setText(_translate("MainWindow", ""))
+                except:
+                    self.exception_handling("stl文件导入失败")
 
                     # global fileopen
-                elif fileExt == ".GCODE":
+            elif fileExt == ".GCODE":
+                try:
                     self.layer_add(filename)
                     self.loading1()
                     print("loading")
@@ -609,8 +610,6 @@ class Ui_MainWindow(object):
                                 if (";Layer height:" in lines[i]):
                                     base4 = True
                     vv2 = True
-                    # if not ((base == True) and (base1 or base2) and ((base3 and base4) or (base5 and base6))):
-                    #     raise Exception
                     if not (base or base1 or base2 or base3 or base4 or base5 or base6) :
                         raise Exception
 
@@ -630,35 +629,42 @@ class Ui_MainWindow(object):
 
                     # Ui_MainWindow.slider.valueChanged.connect(self.loading1)
 
-                else:
-                    print("This file format isn't supported:", fileExt)
+                except:
+                    self.exception_handling("gcode文件导入失败")
+
+            else:
+                print("This file format isn't supported:", fileExt)
         # except IOError as e:
         # print("Error during file opening:", e)
-        except:
-            _translate = QtCore.QCoreApplication.translate
-            self.suggestion1.setText(_translate("MainWindow", "导入文件失败！"))
-            self.handle.setEnabled(False)
-            self.checkBox_4.setChecked(False)
-            self.checkBox.setChecked(False)
-            self.checkBox_2.setChecked(False)
-            self.checkBox_3.setChecked(False)
-            self.checkBox_3.setEnabled(False)
-            self.checkBox.setEnabled(False)
-            self.checkBox_2.setEnabled(False)
-            self.checkBox_4.setEnabled(False)
-            Ui_MainWindow.one_color_radio.setChecked(False)
-            Ui_MainWindow.one_color_radio.setEnabled(False)
-            Ui_MainWindow.much_layers_radio.setChecked(False)
-            Ui_MainWindow.much_layers_radio.setEnabled(False)
-            Ui_MainWindow.mix_colors_radio.setChecked(False)
-            Ui_MainWindow.mix_colors_radio.setEnabled(False)
-            self.layers_num.setText("")
-            self.mix_colors_num.setText("")
-            self.layers_num.setEnabled(False)
-            self.mix_colors_num.setEnabled(False)
-            self.slider.setEnabled(False)
-            Ui_MainWindow.totalHeight.setText(_translate("MainWindow", " "))
-            Ui_MainWindow.namein.setText(_translate("MainWindow", " "))
+
+
+
+    def exception_handling(self,suggestion):
+        _translate = QtCore.QCoreApplication.translate
+        self.suggestion1.setText(_translate("MainWindow", suggestion))
+        self.handle.setEnabled(False)
+        self.checkBox_4.setChecked(False)
+        self.checkBox.setChecked(False)
+        self.checkBox_2.setChecked(False)
+        self.checkBox_3.setChecked(False)
+        self.checkBox_3.setEnabled(False)
+        self.checkBox.setEnabled(False)
+        self.checkBox_2.setEnabled(False)
+        self.checkBox_4.setEnabled(False)
+        Ui_MainWindow.one_color_radio.setChecked(False)
+        Ui_MainWindow.one_color_radio.setEnabled(False)
+        Ui_MainWindow.much_layers_radio.setChecked(False)
+        Ui_MainWindow.much_layers_radio.setEnabled(False)
+        Ui_MainWindow.mix_colors_radio.setChecked(False)
+        Ui_MainWindow.mix_colors_radio.setEnabled(False)
+        self.layers_num.setText("")
+        self.mix_colors_num.setText("")
+        self.layers_num.setEnabled(False)
+        self.mix_colors_num.setEnabled(False)
+        self.slider.setEnabled(False)
+        Ui_MainWindow.totalHeight.setText(_translate("MainWindow", " "))
+        Ui_MainWindow.namein.setText(_translate("MainWindow", " "))
+
 
     def open_gcode(self,nameout):
         layerm1 = 0
@@ -683,100 +689,105 @@ class Ui_MainWindow(object):
         Ui_MainWindow.slider.valueChanged.connect(self.valueChange)
 
     def valueChange(self):
+        try:
+            size = Ui_MainWindow.slider.value()
+            self.label_8.setText(str(size))
+            # layers2 = []
+            # color2 = []
+            # divide = []
+            actors2 = []
 
-        size = Ui_MainWindow.slider.value()
-        self.label_8.setText(str(size))
-        # layers2 = []
-        # color2 = []
-        # divide = []
-        actors2 = []
+            for i in range (size):
+                actors2.append(self.actors[i])
+            for a in range(len(actors2)):
+                if len(self.gode.color) == 0:
+                    actors2[a].GetProperty().SetColor(params.LastLayerColor)
+                elif len(self.gode.color) == 1:
+                    actors2[a].GetProperty().SetColor(self.gode.color[0][0] / 255, self.gode.color[0][1] / 255, self.gode.color[0][2] / 255)
+                elif len(self.gode.color) >1:
+                    for i in range(len(self.gode.color)):
+                        if self.gode.divide[i]<=a<self.gode.divide[i+1]:
+                            actors2[a].GetProperty().SetColor(self.gode.color[i][0] / 255, self.gode.color[i][1] / 255,
+                                                              self.gode.color[i][2] / 255)
 
-        for i in range (size):
-            actors2.append(self.actors[i])
-        for a in range(len(actors2)):
-            if len(self.gode.color) == 0:
-                actors2[a].GetProperty().SetColor(params.LastLayerColor)
-            elif len(self.gode.color) == 1:
-                actors2[a].GetProperty().SetColor(self.gode.color[0][0] / 255, self.gode.color[0][1] / 255, self.gode.color[0][2] / 255)
-            elif len(self.gode.color) >1:
-                for i in range(len(self.gode.color)):
-                    if self.gode.divide[i]<=a<self.gode.divide[i+1]:
-                        actors2[a].GetProperty().SetColor(self.gode.color[i][0] / 255, self.gode.color[i][1] / 255,
-                                                          self.gode.color[i][2] / 255)
+            actors2[-1].GetProperty().SetColor(params.LayerColor)
+            # if len(self.gode.color) == 0:
+            #     blocks2 = gui_utils.makeBlocks(layers2)
+            #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots,color2)#None不能使用len方法
+            # if len(self.gode.color) == 1:
+            #     color2.append(self.gode.color[0])
+            #     blocks2 = gui_utils.makeBlocks(layers2)
+            #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots,color2)
+            # if len(self.gode.color)>1:
+            #     for i in range(len(self.gode.color)):
+            #         for layer in range (self.gode.divide[i],self.gode.divide[i+1]):
+            #             if layer == size-1:
+            #                 for a in range(i+1):
+            #                     color2.append(self.gode.color[a])
+            #                     divide.append(self.gode.divide[a])
+            #                 divide.append(self.gode.divide[i+1])
+                #                 print(color2,divide,size)
+                #     blocks2 = gui_utils.makeBlocks(layers2)
+                #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots, color2,divide)
 
-        actors2[-1].GetProperty().SetColor(params.LayerColor)
-        # if len(self.gode.color) == 0:
-        #     blocks2 = gui_utils.makeBlocks(layers2)
-        #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots,color2)#None不能使用len方法
-        # if len(self.gode.color) == 1:
-        #     color2.append(self.gode.color[0])
-        #     blocks2 = gui_utils.makeBlocks(layers2)
-        #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots,color2)
-        # if len(self.gode.color)>1:
-        #     for i in range(len(self.gode.color)):
-        #         for layer in range (self.gode.divide[i],self.gode.divide[i+1]):
-        #             if layer == size-1:
-        #                 for a in range(i+1):
-        #                     color2.append(self.gode.color[a])
-        #                     divide.append(self.gode.divide[a])
-        #                 divide.append(self.gode.divide[i+1])
-        #                 print(color2,divide,size)
-        #     blocks2 = gui_utils.makeBlocks(layers2)
-        #     self.actors = gui_utils.wrapWithActors(blocks2, self.gode.rotations, self.gode.lays2rots, color2,divide)
+            self.clearScene()
+            self.render.AddActor(self.planeActor)
 
-        self.clearScene()
-        self.render.AddActor(self.planeActor)
-
-        for actor in actors2:
-            self.render.AddActor(actor)
+            for actor in actors2:
+                self.render.AddActor(actor)
 
 
-        # self.loadPlanes()
-        # self.bottom_panel.setEnabled(False)
+            # self.loadPlanes()
+            # self.bottom_panel.setEnabled(False)
 
-        # if addStl:
-        #     self.stateBoth(len(self.actors))
-        # else:
-        #     self.stateGcode(len(self.actors))
+            # if addStl:
+            #     self.stateBoth(len(self.actors))
+            # else:
+            #     self.stateGcode(len(self.actors))
 
-        self.openedGCode = filename
-        self.reloadScene()
+            self.openedGCode = filename
+            self.reloadScene()
+        except:
+            self.exception_handling("分层预览失败")
 
     def loadGCode(self, filename, addStl):
-        # print("111")
-        gode = gcode.readGCode(filename)
-        # print("222")
+        try:
+            gode = gcode.readGCode(filename)
+            self.gode = gode
+        except:
+            self.exception_handling("gcode文件解析失败")
 
+        try:
+            blocks = gui_utils.makeBlocks(self.gode.layers)
+            self.blocks = blocks
+            print(len(blocks))
+        except:
+            self.exception_handling("面片生成失败")
+        try:
+            self.actors = gui_utils.wrapWithActors(self.blocks, self.gode.rotations, self.gode.lays2rots,self.gode.color,self.gode.divide)
+            self.clearScene()
+            self.planeActor = gui_utils.createPlaneActorCircle(self.gode.center)
+            self.render.AddActor(self.planeActor)
+            if addStl:
+                self.render.AddActor(self.stlActor)
 
-        self.gode = gode
-        # for i in range(len(gode.layers)):
-        #     self.color.append([73/255,233/255,41/255])
+            self.rotatePlane(self.gode.rotations[-1])
+            for actor in self.actors:
+                self.render.AddActor(actor)
 
-        blocks = gui_utils.makeBlocks(gode.layers)
-        print(len(blocks))
-        self.actors = gui_utils.wrapWithActors(blocks, gode.rotations, gode.lays2rots,gode.color,gode.divide)
+            # self.loadPlanes()
+            # self.bottom_panel.setEnabled(False)
 
-        self.clearScene()
-        self.planeActor = gui_utils.createPlaneActorCircle(gode.center)
-        self.render.AddActor(self.planeActor)
-        if addStl:
-            self.render.AddActor(self.stlActor)
+            # if addStl:
+            #     self.stateBoth(len(self.actors))
+            # else:
+            #     self.stateGcode(len(self.actors))
 
-        self.rotatePlane(gode.rotations[-1])
-        for actor in self.actors:
-            self.render.AddActor(actor)
-
-        # self.loadPlanes()
-        # self.bottom_panel.setEnabled(False)
-
-        # if addStl:
-        #     self.stateBoth(len(self.actors))
-        # else:
-        #     self.stateGcode(len(self.actors))
-
-        self.openedGCode = filename
-        self.render.ResetCamera()
-        self.reloadScene()
+            self.openedGCode = filename
+            self.render.ResetCamera()
+            self.reloadScene()
+        except:
+            self.exception_handling("文件渲染失败")
 
     def clearScene(self):
         self.render.RemoveAllViewProps()
