@@ -612,7 +612,7 @@ class Ui_MainWindow(object):
                                 if (";Layer height:" in lines[i]):
                                     base4 = True
                     vv2 = True
-                    if not (base or base1 or base2 or base3 or base4 or base5 or base6) :
+                    if not ((base3 and base4) or (base2 and base5 and base6)):
                         raise Exception
 
                     Ui_MainWindow.one_color_radio.setEnabled(True)
@@ -814,6 +814,8 @@ class Ui_MainWindow(object):
             j = -1
 
             for i in range(len(linestoedit)):
+                if "Generated with Cura_SteamEngine" in linestoedit[i]:
+                    break
                 if ";LAYER:" in linestoedit[i]:
                     pass
                 if linestoedit[i].startswith("G1") and 'E' not in linestoedit[i]:
