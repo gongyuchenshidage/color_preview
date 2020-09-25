@@ -815,7 +815,9 @@ class Ui_MainWindow(object):
 
             for i in range(len(linestoedit)):
                 if ";LAYER:" in linestoedit[i]:
-                    break
+                    pass
+                if linestoedit[i].startswith("G1") and 'E' not in linestoedit[i]:
+                    linestoedit[i] = linestoedit[i].replace("G1","G0")
                 if 'G1' in linestoedit[i] and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle' not in \
                         linestoedit[i]:
                     j += 1

@@ -137,7 +137,7 @@ def parseGCode(lines):
                     plane.append([a, -b, 0])
 
             args = line.split(" ")
-            if args[0] == "G0":  # move to (or rotate)
+            if args[0] == "G0" :  # move to (or rotate)
                 if len(path) > 1:  # finish path and start new
                     layer.append(path)
                 x, y, z, z_rot = parseArgs(args[1:], x, y, z, abs_pos)
@@ -152,7 +152,7 @@ def parseGCode(lines):
                  c = float(getValue(line, "C", -1))
                  color.append(material_chose(a,b,c))
 
-            elif args[0] == "G1":  # draw to
+            elif args[0] == "G1" :  # draw to
                 x, y, z, _ = parseArgs(args[1:], x, y, z, abs_pos)
                 path.append([x, y, z])
 

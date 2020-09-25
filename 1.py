@@ -137,4 +137,4 @@ def getValue(layer, key, default=None):  # replace default getvalue due to comme
         return default
 
 
-readGCode1(r"G:\360MoveData\Users\Administrator\Desktop\stl_file\gongyuchen.gcode")
+# readGCode1(r"G:\360MoveData\Users\Administrator\Desktop\stl_file\gongyuchen.gcode")
