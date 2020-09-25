@@ -553,7 +553,7 @@ class Ui_MainWindow(object):
 
         filename = str(
                 QFileDialog.getOpenFileName(None, self.locale.OpenModel, ",",
-                                            "STL(*.stl);;GCODE(*.gcode)")[0])  # TODO: fix path
+                                            "GCODE(*.gcode);;STL(*.stl)")[0])  # TODO: fix path
 
         if filename != "":
             layerm = 0
@@ -563,6 +563,7 @@ class Ui_MainWindow(object):
             if fileExt == ".STL":
                 try:
                     self.loadSTL(filename)
+                    QApplication.processEvents()
                     Ui_MainWindow.one_color_radio.setEnabled(False)
                     Ui_MainWindow.much_layers_radio.setEnabled(False)
                     Ui_MainWindow.mix_colors_radio.setEnabled(False)
@@ -581,6 +582,7 @@ class Ui_MainWindow(object):
                     self.loading1()
                     print("loading")
                     self.loadGCode(filename, False)
+                    QApplication.processEvents()
                     print("loading")
                     vv1 = True
                     with open(filename) as file1:
@@ -747,6 +749,7 @@ class Ui_MainWindow(object):
 
             self.openedGCode = filename
             self.reloadScene()
+            QApplication.processEvents()
         except:
             self.exception_handling("分层预览失败")
 

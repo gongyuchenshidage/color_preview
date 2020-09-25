@@ -189,7 +189,7 @@ def one_color_printing_active(linestoedit, R, G, B, color_back_number):
             if (j == 2):
                 break
             linestoedit[i] = linestoedit[i].replace(linestoedit[i], instruction + "\n" + linestoedit[i])
-            QApplication.processEvents()
+            # QApplication.processEvents()
     m = len(linestoedit)
     savefile(linestoedit)
 
@@ -224,7 +224,7 @@ def mutiple_color_printing_active(linestoedit,number,color_back_number):
                         continue
                     # instruction = material_chose(int(number[item][2]), int(number[item][3]), int(number[item][4]))[0]
                     linestoedit[i] = linestoedit[i].replace(linestoedit[i], instruction + "\n" + linestoedit[i])
-                    QApplication.processEvents()
+                    # QApplication.processEvents()
             layer += 1
     m = len(linestoedit)
     savefile(linestoedit)
@@ -295,7 +295,7 @@ def Gradientprinting_active(linestoedit,color_start, color_stop,color_start_10,c
                     color_from[2] + (color_to[2] - color_from[2]) * (
                     (current_z - (color_index - 1) * height_step) / height_step))
                 linestoedit[i] = linestoedit[i].replace(linestoedit[i], linestoedit[i]+ gradient_line + "\n")
-                QApplication.processEvents()
+                # QApplication.processEvents()
         m = len(linestoedit)
     savefile(linestoedit)
         #start_time = time.process_time()
@@ -380,7 +380,7 @@ def PrusaGradient_active( linestoedit,color_start, color_stop,color_start_10,col
                             (current_z - (color_index - 1) * height_step) / height_step))
                 linestoedit[i] = linestoedit[i].replace(linestoedit[i], gradient_line + "\n" + linestoedit[i])
                 print(linestoedit[i])
-                QApplication.processEvents()
+                # QApplication.processEvents()
 
 
     print("156")
@@ -485,7 +485,7 @@ def Custom_Gradientprinting_active( linestoedit,color_start, color_stop,custom_l
                     color_from[2] + (color_to[2] - color_from[2]) * (
                             (current_z - sum(height_step[:color_index - 1])) / height_step[color_index - 1]))
                 linestoedit[i] = linestoedit[i].replace(linestoedit[i], gradient_line + "\n" + linestoedit[i])
-                QApplication.processEvents()
+                # QApplication.processEvents()
 
     m = len(linestoedit)  # 处理后文件行数
     # print(m, n)
@@ -940,6 +940,7 @@ def postprocessingplugin():#获得数据，进行处理
             loading()
             one_color_printing(untitled.filename,lines1,color_R,color_G,color_B,colorflag)
             openGcodeModel()#重新载入处理后的gcode文件进行预览
+            QApplication.processEvents()
         except:
             ui.exception_handling("单色处理失败")
     elif mode == "much_layers":
@@ -998,6 +999,7 @@ def postprocessingplugin():#获得数据，进行处理
                     msg_box = QMessageBox(QMessageBox.Warning, '警告', '亲爱的用户，您所已输入层高已超限制，请检查后重新输入')
                     msg_box.exec_()
             openGcodeModel()
+            QApplication.processEvents()
         except:
             ui.exception_handling("分层处理失败")
     elif mode == "mix_colors":
@@ -1032,6 +1034,7 @@ def postprocessingplugin():#获得数据，进行处理
     #            print(colorstopoptions)
             loading()
             openGcodeModel()
+            QApplication.processEvents()
         except:
             ui.exception_handling("渐变处理失败")
 
