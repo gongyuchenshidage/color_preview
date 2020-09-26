@@ -54,10 +54,10 @@ info1 = [
 
 colorflag = [""]
 def Prusagetvalue(layer,key,default= None):
-    if key not in layer :
+    if key not in layer:
         return default
     subPart = layer[(layer.find(key) + len(key)):]
-    m = re.search("^[-]?[0-9]*\.?[0-9]*",subPart)
+    m = re.search("[0-9]*\.[0-9]*",subPart)
 
     if m == None:
         return default
@@ -80,7 +80,7 @@ def getValue(layer, key, default=None):  # replace default getvalue due to comme
         return default
 
 def Prusafindtotalheight(layerData):
-    if "G1" in layerData and "Z" in layerData:
+    if ("G1" in layerData or "G0"in layerData) and "Z" in layerData:
         foundZ = Prusagetvalue(layerData,"Z",-1)
         if foundZ != -1:
             return float(foundZ)
@@ -270,7 +270,7 @@ def Gradientprinting_active(linestoedit,color_start, color_stop,color_start_10,c
         total = 0
         z_changed = False
         line_index = i
-        if ("G0" in linestoedit[i] or "G1" in linestoedit[i]) and "Z" in linestoedit[i]:
+        if ("G0" in linestoedit[i] or "G1" in linestoedit[i]) and "Z" in linestoedit[i] and "Move" not in linestoedit[i]:
             newZ = getValue(linestoedit[i], "Z", z)
             current_z = newZ
             x = getValue(linestoedit[i], "X", None)
@@ -350,18 +350,17 @@ def PrusaGradient_active( linestoedit,color_start, color_stop,color_start_10,col
     z = 0
 
     color_index = 0
-    print("155")
     for i in range(len(linestoedit)):
         total = 0
         z_changed = False
         line_index = i
-        if ("G0" in linestoedit[i] or "G1" in linestoedit[i]) and "Z" in linestoedit[i] and "nozzle" not in linestoedit[i]:
+        if ("G0" in linestoedit[i] or "G1" in linestoedit[i]) and "Z" in linestoedit[i]:
             newZ = Prusagetvalue(linestoedit[i], "Z", z)
             current_z = newZ
             if newZ != z:
                 z = newZ
                 z_changed = True
-        if ("G1" in linestoedit[i]) and (z_changed):
+        if ("G1" in linestoedit[i] or "G0" in linestoedit[i]) and (z_changed):
             if z > color_index * height_step:
                 color_index += 1
                 if color_index > len(color_all[0]):
@@ -382,8 +381,6 @@ def PrusaGradient_active( linestoedit,color_start, color_stop,color_start_10,col
                 print(linestoedit[i])
                 # QApplication.processEvents()
 
-
-    print("156")
     m = len(linestoedit)
     global lineprocess
     lineprocess = True
@@ -520,8 +517,9 @@ def PrusaCustom_Gradientprinting_active(linestoedit,color_start, color_stop,cust
                     1].split(",")
                 b = [float(instruction_1[0]), float(instruction_1[1]), float(instruction_1[2])]
                 color_all[i][ii] = list(map(lambda x: x / sum(b), b))
+    print(color_all)
     totalHeight = -1
-    current_layer = n - 1
+    current_layer = len(linestoedit) - 1
     while totalHeight == -1:
         layer_1 = linestoedit[current_layer]
         totalHeight = Prusafindtotalheight(layer_1)
@@ -531,28 +529,25 @@ def PrusaCustom_Gradientprinting_active(linestoedit,color_start, color_stop,cust
         current_layer -= 1
     print(totalHeight)
     z = 0
-    x = None
-    y = None
     current_z = 0
     z_changed = False
     insert_gradient = True
     color_index = 0
     layer_step = 0
+    height_step = []
     # 找到第一层高度
     for i in range(len(linestoedit)):
-        layer = linestoedit[~i]
-        if "; first_layer_height" in layer:
-            first_z = re.search("[0-9]*\.[0-9]*", layer)
+        if "; first_layer_height" in linestoedit[i]:
+            first_z = re.search("[0-9]*\.[0-9]*", linestoedit[i])
             first_z = float(first_z.group(0))
             break
     # 找到层高
     for i in range(len(linestoedit)):
-        layer = linestoedit[~i]
-        if "; layer_height" in layer:
-            layer_height = re.search("[0-9]*\.[0-9]", layer)
+        if "; layer_height" in linestoedit[i]:
+            layer_height = re.search("[0-9]*\.[0-9]", linestoedit[i])
             layer_height = float(layer_height.group(0))
             break
-    height_step = []
+
     for i in range(len(custom_layer[0])):
         if i == 0:
             b = (int(custom_layer[1][i]) - int(custom_layer[0][i]) + 1) * layer_height + first_z
@@ -563,15 +558,16 @@ def PrusaCustom_Gradientprinting_active(linestoedit,color_start, color_stop,cust
     for i in range(len(linestoedit)):
         total = 0
         z_changed = False
-        if ("G1" in linestoedit[i]) and "Z" in linestoedit[i]:
+        if (("G0" in linestoedit[i]) or ("G1" in linestoedit[i])) and "Z" in linestoedit[i] and "nozzle" not in linestoedit[i]:
             newZ = Prusagetvalue(linestoedit[i], "Z", z)
+            print(newZ)
             current_z = newZ
             if newZ != z:
                 z = newZ
                 z_changed = True
-        if ("G1" in linestoedit[i]) and (z_changed):
-            if z >= ((int(custom_layer[0][layer_step]) - 1) * (layer_height) + first_z) and z <= (
-                    int(custom_layer[1][layer_step]) * (layer_height) + first_z):
+            print(z_changed)
+        if (("G1" in linestoedit[i]) or ("G0" in linestoedit[i])) and (z_changed):
+            if z >= ((int(custom_layer[0][layer_step]) - 1) * (layer_height) + first_z) and z <= (int(custom_layer[1][layer_step]) * (layer_height) + first_z):
                 color_index += 1
                 layer_step += 1
                 if layer_step == len(color_all[0]):
@@ -590,8 +586,8 @@ def PrusaCustom_Gradientprinting_active(linestoedit,color_start, color_stop,cust
                     color_from[2] + (color_to[2] - color_from[2]) * (
                             (current_z - sum(height_step[:(color_index - 1)])) / height_step[color_index - 1]))
                 linestoedit[i] = linestoedit[i].replace(linestoedit[i], gradient_line + "\n" + linestoedit[i])
-                QApplication.processevents()
-
+                #QApplication.processEvents()
+                #print(gradient_line)
 
     m = len(linestoedit)
     global lineprocess
@@ -603,22 +599,6 @@ def PrusaCustom_Gradientprinting_active(linestoedit,color_start, color_stop,cust
     # line_correct += lines[line]  将数组内容集中
     # end_time = time.process_time()
 
-def layer_add(input_file_name,linestoedit):
-    if 'PrusaSlicer' in linestoedit:
-        j = -1
-        for i in range(len(linestoedit)):
-            if ";LAYER:" in linestoedit[i]:
-                break
-            if 'G1' in linestoedit[i] and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle'not in linestoedit[i]:
-                j += 1
-                linestoedit[i] = linestoedit[i].replace(linestoedit[i], ";LAYER:" + "{}".format(j) + "\n" + linestoedit[i])
-        count = "LAYER_COUNT:{}".format(j)
-        m=len(linestoedit)
-        with open(input_file_name) as fw:
-            for i in range(m):
-                fw.write(linestoedit[i])
-            fw.write('\n' + ';' + count)
-            fw.close()
 
 def soft_choose(input_file):
     with open(input_file,"r+") as f:

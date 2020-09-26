@@ -816,16 +816,17 @@ class Ui_MainWindow(object):
             for i in range(len(linestoedit)):
                 if "Generated with Cura_SteamEngine" in linestoedit[i]:
                     break
-                if ";LAYER:" in linestoedit[i]:
-                    pass
+                if "G0" in linestoedit[i]:
+                    break
                 if linestoedit[i].startswith("G1") and 'E' not in linestoedit[i]:
                     linestoedit[i] = linestoedit[i].replace("G1","G0")
-                if 'G1' in linestoedit[i] and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle' not in \
+                if ("G1" or "G0" in linestoedit[i]) and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle' not in \
                         linestoedit[i]:
                     j += 1
                     linestoedit[i] = linestoedit[i].replace(linestoedit[i],
                                                             ";LAYER:" + "{}".format(j) + "\n" + linestoedit[i])
-            count = "LAYER_COUNT:{}".format(j)
+
+            count = "LAYER_CO UNT:{}".format(j)
             m = len(linestoedit)
             self.save_3rfile(input_file_name, linestoedit, count, m)
 
