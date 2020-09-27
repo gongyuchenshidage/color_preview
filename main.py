@@ -200,7 +200,10 @@ def mutiple_color_printing_active(linestoedit,number,color_back_number):
     a = [0 for _ in range(len(number))]
     color_index = 0
     flag = 1
-    number_count = 1
+    if len(number) > 1:
+        number_count = 1
+    else:
+        number_count = 0
     for i in range(len(linestoedit)):
         if (";LAYER" in linestoedit[i] and "COUNT" not in linestoedit[i]):
             if color_back_number[color_index] == 1:

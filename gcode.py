@@ -151,6 +151,7 @@ def parseGCode(lines):
                  b = float(getValue(line, "B", -1))
                  c = float(getValue(line, "C", -1))
                  color.append(material_chose(a,b,c))
+                 print(color)
 
             elif args[0] == "G1" :  # draw to
                 x, y, z, _ = parseArgs(args[1:], x, y, z, abs_pos)

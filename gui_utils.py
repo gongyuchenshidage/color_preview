@@ -107,10 +107,10 @@ def createStlActorInOrigin(filename, colorize=False):
     return actor, (-origin[0], -origin[1], -origin[2]), getBounds(output)  # return not origin but applied translation
 
 
-def makeBlocks(layers):#将离散点变成面片信息
+def makeBlocks(layers):   #  将离散点变成面片信息
     blocks = []
     for layer in layers:
-        points = vtk.vtkPoints()#点云
+        points = vtk.vtkPoints()    #  点云
         lines = vtk.vtkCellArray()
         block = vtk.vtkPolyData()
         points_count = 0
