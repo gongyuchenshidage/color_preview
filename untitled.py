@@ -842,16 +842,15 @@ class Ui_MainWindow(object):
                     break
                 if linestoedit[i].startswith("G1") and 'E' not in linestoedit[i]:
                     linestoedit[i] = linestoedit[i].replace("G1", "G0")
-                if 'G1' in linestoedit[i] and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle' not in \
+                if 'G0' in linestoedit[i] and 'Z' in linestoedit[i] and 'F' in linestoedit[i] and 'nozzle' not in \
                         linestoedit[i]:
                     j += 1
                     linestoedit[i] = linestoedit[i].replace(linestoedit[i],
                                                             ";LAYER:" + "{}".format(j) + "\n" + linestoedit[i])
-            count = "LAYER_COUNT:{}".format(j)
+            #count = "LAYER_COUNT:{}".format(j)
             m = len(linestoedit)
-            self.save_3rfile(input_file_name, linestoedit, count, m)
-
-    def save_3rfile(self, inputfilename, linestoedit, count, m):
+            self.save_3rfile(input_file_name, linestoedit, m)
+    def save_3rfile(self, inputfilename, linestoedit,m):
         with open(inputfilename, "w+") as fw:
             for i in range(m):
                 fw.write(linestoedit[i])
